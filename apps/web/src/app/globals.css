@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-bg: #0f1724;
+  --app-bg-elevated: #162233;
+  --panel-bg: #172437;
+  --panel-border: #2a3f59;
+  --text-main: #f3f7fb;
+  --text-muted: #c3d1df;
+  --accent: #f2b93d;
+  --accent-strong: #ffcf5f;
+  --ok: #5bd2a4;
+  --warn: #ffb84d;
+  --danger: #ff8a8a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text-main);
+  font-family: 'IBM Plex Sans', 'Franklin Gothic Medium', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  background:
+    radial-gradient(70rem 45rem at 6% -6%, #29415d 0%, transparent 60%),
+    radial-gradient(60rem 40rem at 100% 0%, #28384e 0%, transparent 58%),
+    linear-gradient(180deg, var(--app-bg-elevated) 0%, var(--app-bg) 50%);
+}
+
+.bg-app-bg {
+  background-color: var(--app-bg);
+}
+
+.panel {
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  border-radius: 1rem;
+  box-shadow: 0 8px 28px rgba(4, 10, 18, 0.28);
+}
+
+input,
+select,
+textarea {
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #8fa6bd;
+}
+
+button {
+  letter-spacing: 0.01em;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+  .panel {
+    border-radius: 0.85rem;
+  }
+}
