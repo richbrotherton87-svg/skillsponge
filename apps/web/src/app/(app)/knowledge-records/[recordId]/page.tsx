@@ -1,15 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { RecordDetail } from '@/features/knowledge-records/components/record-detail';
-import {
-  getKnowledgeRecordById,
-  getLatestUnresolvedReviewComment,
-  getRelatedRecords,
-  listAuditEvents,
-  listRecordVersions,
-  listReviewComments
-} from '@/lib/knowledge-service';
+import { ArrowLeft } from 'lucide-react';
 import { requireAnyRole } from '@/lib/authz';
+import { getKnowledgeRecordById, getLatestUnresolvedReviewComment, getRelatedRecords, listAuditEvents, listRecordVersions, listReviewComments } from '@/lib/knowledge-service';
+import { RecordDetail } from '@/features/knowledge-records/components/record-detail';
+import { Button } from '@/components/ui/button';
 
 interface RecordDetailPageProps {
   params: Promise<{ recordId: string }>;
@@ -22,9 +17,7 @@ export default async function RecordDetailPage({ params, searchParams }: RecordD
   const query = (await searchParams) ?? {};
   const record = await getKnowledgeRecordById(recordId);
 
-  if (!record) {
-    notFound();
-  }
+  if (!record) notFound();
 
   const [related, auditEvents, versions, unresolvedReviewComment, reviewComments] = await Promise.all([
     getRelatedRecords(record),
@@ -36,22 +29,16 @@ export default async function RecordDetailPage({ params, searchParams }: RecordD
 
   return (
     <div className="space-y-4">
-      {query.created === '1' && (
-        <div className="panel border-emerald-700 bg-emerald-900/20 p-3 text-sm text-emerald-300">
-          Record saved successfully. It is currently in draft status.
-        </div>
-      )}
-      {query.updated === '1' && (
-        <div className="panel border-amber-700 bg-amber-900/20 p-3 text-sm text-amber-300">
-          Record updated. A new version was created and review status was recalculated.
-        </div>
-      )}
-      <Link href="/knowledge-records" className="inline-block text-sm text-slate-300 hover:text-emerald-300">
-        Back to records
-      </Link>
-      <Link href={`/knowledge-records/${record.id}/edit`} className="inline-block rounded border border-slate-600 px-3 py-2 text-sm hover:bg-slate-800">
-        Edit record
-      </Link>
+      <Button asChild variant="ghost" className="pl-0">
+        <Link href="/knowledge-records">
+          <ArrowLeft className="h-4 w-4" />
+          Back to records
+        </Link>
+      </Button>
+
+      {query.created === '1' && <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-800">Record created successfully.</div>}
+      {query.updated === '1' && <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">Record updated and version history refreshed.</div>}
+
       <RecordDetail
         record={record}
         related={related}

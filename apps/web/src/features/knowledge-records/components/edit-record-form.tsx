@@ -1,10 +1,14 @@
 import { updateKnowledgeRecordAction } from '@/app/(app)/actions';
 import { ExpertProfile, HandoverPack, KnowledgeRecord } from '@/lib/domain';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 export function EditRecordForm({
   record,
   expertProfiles,
-  handoverPacks
+  handoverPacks,
 }: {
   record: KnowledgeRecord;
   expertProfiles: ExpertProfile[];
@@ -16,84 +20,83 @@ export function EditRecordForm({
     <form action={updateKnowledgeRecordAction} className="space-y-4">
       <input type="hidden" name="id" value={record.id} />
 
-      <section className="panel p-4">
-        <h3 className="text-lg font-semibold">Edit record</h3>
-        <p className="mt-1 text-sm text-slate-400">Saving creates a new version. If currently approved, it is moved to under review.</p>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <label className="text-sm">
-            <span className="mb-1 block text-slate-300">Title</span>
-            <input name="title" defaultValue={record.title} required className="w-full rounded-md border border-slate-700 bg-slate-900 p-3" />
-          </label>
-          <label className="text-sm">
-            <span className="mb-1 block text-slate-300">Confidence</span>
-            <select name="confidence" defaultValue={record.confidence} className="w-full rounded-md border border-slate-700 bg-slate-900 p-3">
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-            </select>
-          </label>
-        </div>
-      </section>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Edit record</CardTitle>
+          <p className="text-sm text-muted-foreground">Saving creates a new version. If currently approved, it is moved to under review.</p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2">
+            <label className="text-sm space-y-1.5">
+              <span className="font-medium">Title</span>
+              <Input name="title" defaultValue={record.title} required />
+            </label>
+            <label className="text-sm space-y-1.5">
+              <span className="font-medium">Confidence</span>
+              <select name="confidence" defaultValue={record.confidence} className="w-full rounded-md border bg-background px-3 py-2 text-sm">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+            </label>
+          </div>
+        </CardContent>
+      </Card>
 
-      <section className="panel p-4">
-        <h3 className="text-lg font-semibold">Context</h3>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <input name="asset" required defaultValue={record.context.asset} className="rounded-md border border-slate-700 bg-slate-900 p-3" placeholder="Asset" />
-          <input name="system" required defaultValue={record.context.system} className="rounded-md border border-slate-700 bg-slate-900 p-3" placeholder="System" />
-          <input name="task" required defaultValue={record.context.task} className="rounded-md border border-slate-700 bg-slate-900 p-3" placeholder="Task" />
-          <input name="symptom" required defaultValue={record.context.symptom} className="rounded-md border border-slate-700 bg-slate-900 p-3" placeholder="Symptom" />
-          <input name="environment" required defaultValue={record.context.environment} className="rounded-md border border-slate-700 bg-slate-900 p-3 md:col-span-2" placeholder="Environment" />
-          <input name="tags" defaultValue={record.tags.join(', ')} className="rounded-md border border-slate-700 bg-slate-900 p-3 md:col-span-2" placeholder="Tags (comma separated)" />
-          <label className="text-sm md:col-span-2">
-            <span className="mb-1 block text-slate-300">Source expert (optional)</span>
-            <select name="sourceExpertId" defaultValue={record.sourceExpertId ?? ''} className="w-full rounded-md border border-slate-700 bg-slate-900 p-3">
-              <option value="">None</option>
-              {expertProfiles.map((profile) => (
-                <option key={profile.id} value={profile.id}>
-                  {profile.name} ({profile.roleFocus})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="text-sm md:col-span-2">
-            <span className="mb-1 block text-slate-300">Linked handover pack (optional)</span>
-            <select name="handoverPackId" defaultValue={record.handoverPackId ?? ''} className="w-full rounded-md border border-slate-700 bg-slate-900 p-3">
-              <option value="">None</option>
-              {handoverPacks.map((pack) => (
-                <option key={pack.id} value={pack.id}>
-                  {pack.expertName}
-                  {' -> '}
-                  {pack.targetRole} ({pack.status.replaceAll('_', ' ')})
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </section>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Context</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2">
+            <Input name="asset" required defaultValue={record.context.asset} placeholder="Asset" />
+            <Input name="system" required defaultValue={record.context.system} placeholder="System" />
+            <Input name="task" required defaultValue={record.context.task} placeholder="Task" />
+            <Input name="symptom" required defaultValue={record.context.symptom} placeholder="Symptom" />
+            <Input name="environment" required defaultValue={record.context.environment} placeholder="Environment" className="md:col-span-2" />
+            <Input name="tags" defaultValue={record.tags.join(', ')} placeholder="Tags (comma separated)" className="md:col-span-2" />
+            <label className="text-sm space-y-1.5 md:col-span-2">
+              <span className="font-medium">Source expert (optional)</span>
+              <select name="sourceExpertId" defaultValue={record.sourceExpertId ?? ''} className="w-full rounded-md border bg-background px-3 py-2 text-sm">
+                <option value="">None</option>
+                {expertProfiles.map((profile) => (
+                  <option key={profile.id} value={profile.id}>{profile.name} ({profile.roleFocus})</option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm space-y-1.5 md:col-span-2">
+              <span className="font-medium">Linked handover pack (optional)</span>
+              <select name="handoverPackId" defaultValue={record.handoverPackId ?? ''} className="w-full rounded-md border bg-background px-3 py-2 text-sm">
+                <option value="">None</option>
+                {handoverPacks.map((pack) => (
+                  <option key={pack.id} value={pack.id}>{pack.expertName} &rarr; {pack.targetRole} ({pack.status.replaceAll('_', ' ')})</option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </CardContent>
+      </Card>
 
-      <section className="panel p-4">
-        <label className="text-sm block">
-          <span className="mb-1 block text-slate-300">Body</span>
-          <textarea name="body" defaultValue={record.body} required rows={10} className="w-full rounded-md border border-slate-700 bg-slate-900 p-3" />
-        </label>
-        <label className="text-sm block mt-3">
-          <span className="mb-1 block text-slate-300">Change note</span>
-          <input name="changeNote" className="w-full rounded-md border border-slate-700 bg-slate-900 p-3" placeholder="What changed and why?" />
-        </label>
-        {requiresApprovedEditReason && (
-          <label className="text-sm block mt-3">
-            <span className="mb-1 block text-slate-300">Reason for editing approved record</span>
-            <input
-              name="changeReason"
-              required
-              className="w-full rounded-md border border-amber-600 bg-slate-900 p-3"
-              placeholder="Why does this approved method need to change?"
-            />
+      <Card>
+        <CardContent className="space-y-3 pt-6">
+          <label className="text-sm space-y-1.5 block">
+            <span className="font-medium">Body</span>
+            <Textarea name="body" defaultValue={record.body} required rows={10} />
           </label>
-        )}
-      </section>
+          <label className="text-sm space-y-1.5 block">
+            <span className="font-medium">Change note</span>
+            <Input name="changeNote" placeholder="What changed and why?" />
+          </label>
+          {requiresApprovedEditReason && (
+            <label className="text-sm space-y-1.5 block">
+              <span className="font-medium text-yellow-500">Reason for editing approved record</span>
+              <Input name="changeReason" required placeholder="Why does this approved method need to change?" className="border-yellow-500/30" />
+            </label>
+          )}
+        </CardContent>
+      </Card>
 
-      <button className="w-full rounded bg-emerald-500 py-3 font-semibold text-slate-950">Save new version</button>
+      <Button type="submit" className="w-full" size="lg">Save new version</Button>
     </form>
   );
 }

@@ -1,38 +1,44 @@
 import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ContinuityRiskRow } from '@/lib/continuity-risk';
+import { cn } from '@/lib/utils';
 
-function riskBadgeClass(level: ContinuityRiskRow['riskLevel']): string {
-  if (level === 'HIGH') return 'bg-rose-900/70 text-rose-200';
-  if (level === 'MEDIUM') return 'bg-amber-900/70 text-amber-200';
-  return 'bg-emerald-900/70 text-emerald-200';
+function riskBadgeVariant(level: ContinuityRiskRow['riskLevel']) {
+  if (level === 'HIGH') return 'border-red-500/40 bg-red-500/10 text-red-400';
+  if (level === 'MEDIUM') return 'border-yellow-500/40 bg-yellow-500/10 text-yellow-500';
+  return 'border-emerald-500/40 bg-emerald-500/10 text-emerald-500';
 }
 
 export function ContinuityRiskBoard({ rows }: { rows: ContinuityRiskRow[] }) {
   return (
-    <section className="panel p-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Knowledge continuity risk</h3>
-        <Link href="/handover-packs" className="text-sm font-medium text-emerald-300 hover:text-emerald-200">
+    <Card>
+      <CardHeader className="flex-row items-center justify-between pb-3">
+        <CardTitle className="text-base">Knowledge continuity risk</CardTitle>
+        <Button variant="link" size="sm" render={<Link href="/handover-packs" />} className="text-primary">
           Manage handover packs
-        </Link>
-      </div>
-      <ul className="mt-3 space-y-2 text-sm">
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-2">
         {rows.map((row) => (
-          <li key={row.expertId} className="rounded bg-slate-900 p-3">
+          <div key={row.expertId} className="rounded-md border p-3">
             <div className="flex items-center justify-between gap-2">
-              <p className="font-medium">{row.expertName}</p>
-              <span className={`rounded px-2 py-1 text-xs font-semibold ${riskBadgeClass(row.riskLevel)}`}>{row.riskLevel}</span>
+              <p className="text-sm font-medium">{row.expertName}</p>
+              <Badge variant="outline" className={cn('text-[10px] font-semibold uppercase', riskBadgeVariant(row.riskLevel))}>
+                {row.riskLevel}
+              </Badge>
             </div>
-            <p className="mt-1 text-slate-300">
-              {row.flaggedReason} • Linked records {row.linkedRecords} ({row.approvedLinkedRecords} approved)
+            <p className="mt-1 text-sm text-muted-foreground">
+              {row.flaggedReason} &middot; Linked records {row.linkedRecords} ({row.approvedLinkedRecords} approved)
             </p>
-            <p className="mt-1 text-xs text-slate-400">
-              {row.handoverPackId ? `Pack ${row.handoverStatus} • Coverage ${row.coverageScore ?? 0}% • Target ${row.targetRole}` : 'No pack assigned'}
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {row.handoverPackId ? `Pack ${row.handoverStatus} \u2022 Coverage ${row.coverageScore ?? 0}% \u2022 Target ${row.targetRole}` : 'No pack assigned'}
             </p>
-          </li>
+          </div>
         ))}
-        {!rows.length && <li className="rounded bg-slate-900 p-3 text-slate-300">No expert risk profiles yet.</li>}
-      </ul>
-    </section>
+        {!rows.length && <p className="text-sm text-muted-foreground">No expert risk profiles yet.</p>}
+      </CardContent>
+    </Card>
   );
 }

@@ -1,68 +1,73 @@
 import Link from 'next/link';
 import { StatusBadge } from '@/components/ui/status-badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { DashboardMetrics, KnowledgeRecord } from '@/lib/domain';
+import { FileText, CheckCircle, PenTool, Users, Eye, AlertTriangle, Package, Plus } from 'lucide-react';
+
+const STAT_CARDS = [
+  { key: 'totalRecords', label: 'Total records', icon: FileText },
+  { key: 'approvedRecords', label: 'Approved', icon: CheckCircle },
+  { key: 'draftRecords', label: 'Drafts', icon: PenTool },
+  { key: 'expertInterviewsCaptured', label: 'Interviews', icon: Users },
+  { key: 'shadowingRecordsCaptured', label: 'Shadowing', icon: Eye },
+  { key: 'atRiskExperts', label: 'At-risk experts', icon: AlertTriangle },
+  { key: 'openHandoverPacks', label: 'Open packs', icon: Package },
+] as const;
 
 export function DashboardOverview({
   metrics,
-  recentRecords
+  recentRecords,
 }: {
   metrics: DashboardMetrics;
   recentRecords: KnowledgeRecord[];
 }) {
   return (
     <div className="space-y-4">
-      <section className="grid gap-3 md:grid-cols-8">
-        <article className="panel p-4">
-          <p className="text-sm text-slate-400">Total records</p>
-          <p className="mt-1 text-2xl font-bold">{metrics.totalRecords}</p>
-        </article>
-        <article className="panel p-4">
-          <p className="text-sm text-slate-400">Approved records</p>
-          <p className="mt-1 text-2xl font-bold">{metrics.approvedRecords}</p>
-        </article>
-        <article className="panel p-4">
-          <p className="text-sm text-slate-400">Draft records</p>
-          <p className="mt-1 text-2xl font-bold">{metrics.draftRecords}</p>
-        </article>
-        <article className="panel p-4">
-          <p className="text-sm text-slate-400">Expert interviews</p>
-          <p className="mt-1 text-2xl font-bold">{metrics.expertInterviewsCaptured}</p>
-        </article>
-        <article className="panel p-4">
-          <p className="text-sm text-slate-400">Shadowing records</p>
-          <p className="mt-1 text-2xl font-bold">{metrics.shadowingRecordsCaptured}</p>
-        </article>
-        <article className="panel p-4">
-          <p className="text-sm text-slate-400">High-risk experts</p>
-          <p className="mt-1 text-2xl font-bold">{metrics.atRiskExperts}</p>
-        </article>
-        <article className="panel p-4">
-          <p className="text-sm text-slate-400">Open handover packs</p>
-          <p className="mt-1 text-2xl font-bold">{metrics.openHandoverPacks}</p>
-        </article>
-        <article className="panel p-4">
-          <Link href="/capture-knowledge" className="block rounded bg-emerald-500 px-3 py-2 text-center text-sm font-semibold text-slate-950">
-            Capture knowledge
-          </Link>
-        </article>
-      </section>
-
-      <section className="panel p-4">
-        <h3 className="text-lg font-semibold">Recent knowledge activity</h3>
-        <ul className="mt-3 space-y-2">
-          {recentRecords.map((record) => (
-            <li key={record.id} className="flex items-start justify-between gap-4 rounded bg-slate-900 p-3">
+      {/* Metric cards */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {STAT_CARDS.map(({ key, label, icon: Icon }) => (
+          <Card key={key}>
+            <CardContent className="flex items-center gap-3 p-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                <Icon className="h-4 w-4 text-primary" />
+              </div>
               <div>
-                <Link href={`/knowledge-records/${record.id}`} className="font-medium hover:text-emerald-300">
+                <p className="text-sm text-muted-foreground">{label}</p>
+                <p className="text-2xl font-bold">{metrics[key]}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+        <Card className="flex items-center justify-center">
+          <CardContent className="p-4">
+            <Button render={<Link href="/capture-knowledge" />}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              Capture knowledge
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent activity */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Recent knowledge activity</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {recentRecords.map((record) => (
+            <div key={record.id} className="flex items-start justify-between gap-4 rounded-md border p-3">
+              <div className="min-w-0">
+                <Link href={`/knowledge-records/${record.id}`} className="font-medium hover:text-primary transition-colors">
                   {record.title}
                 </Link>
-                <p className="text-sm text-slate-400">{record.context.asset} • {record.context.task}</p>
+                <p className="text-sm text-muted-foreground">{record.context.asset} &middot; {record.context.task}</p>
               </div>
               <StatusBadge state={record.approvalState} />
-            </li>
+            </div>
           ))}
-        </ul>
-      </section>
+        </CardContent>
+      </Card>
     </div>
   );
 }

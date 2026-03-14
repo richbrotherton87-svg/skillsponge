@@ -3,74 +3,112 @@
 @tailwind utilities;
 
 :root {
-  --app-bg: #0f1724;
-  --app-bg-elevated: #162233;
-  --panel-bg: #172437;
-  --panel-border: #2a3f59;
-  --text-main: #f3f7fb;
-  --text-muted: #c3d1df;
-  --accent: #f2b93d;
-  --accent-strong: #ffcf5f;
-  --ok: #5bd2a4;
-  --warn: #ffb84d;
-  --danger: #ff8a8a;
+  --background: 210 40% 98%;
+  --foreground: 215 33% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 33% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 33% 12%;
+  --primary: 155 100% 21%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 16% 90%;
+  --secondary-foreground: 215 33% 12%;
+  --muted: 210 16% 94%;
+  --muted-foreground: 215 15% 40%;
+  --accent: 208 70% 14%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 357 95% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 215 20% 80%;
+  --input: 215 20% 80%;
+  --ring: 155 100% 21%;
+  --radius: 0.85rem;
 }
 
-* {
-  box-sizing: border-box;
+.dark {
+  --background: 216 40% 10%;
+  --foreground: 210 40% 98%;
+  --card: 216 40% 14%;
+  --card-foreground: 210 40% 98%;
+  --popover: 216 40% 14%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 155 100% 28%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 215 25% 24%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 215 25% 20%;
+  --muted-foreground: 214 16% 72%;
+  --accent: 208 70% 18%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 357 95% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 215 20% 30%;
+  --input: 215 20% 30%;
+  --ring: 155 100% 35%;
 }
 
-body {
-  margin: 0;
-  color: var(--text-main);
-  font-family: 'IBM Plex Sans', 'Franklin Gothic Medium', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  background:
-    radial-gradient(70rem 45rem at 6% -6%, #29415d 0%, transparent 60%),
-    radial-gradient(60rem 40rem at 100% 0%, #28384e 0%, transparent 58%),
-    linear-gradient(180deg, var(--app-bg-elevated) 0%, var(--app-bg) 50%);
-}
-
-.bg-app-bg {
-  background-color: var(--app-bg);
-}
-
-.panel {
-  border: 1px solid var(--panel-border);
-  background: var(--panel-bg);
-  border-radius: 1rem;
-  box-shadow: 0 8px 28px rgba(4, 10, 18, 0.28);
-}
-
-input,
-select,
-textarea {
-  font-size: 1rem;
-  line-height: 1.45;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #8fa6bd;
-}
-
-button {
-  letter-spacing: 0.01em;
-}
-
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-a:focus-visible {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 2px;
-}
-
-@media (max-width: 768px) {
-  body {
-    font-size: 16px;
+@layer base {
+  * {
+    @apply border-border;
   }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "IBM Plex Sans", "Segoe UI", "Arial", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(10, 37, 64, 0.08), transparent 32rem),
+      radial-gradient(circle at 100% 0%, rgba(0, 107, 63, 0.08), transparent 28rem);
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    @apply text-base;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer components {
   .panel {
-    border-radius: 0.85rem;
+    @apply rounded-xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)];
+  }
+
+  .app-shell-bg {
+    background-image:
+      linear-gradient(180deg, rgba(10, 37, 64, 0.04), rgba(10, 37, 64, 0)),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 48px,
+        rgba(15, 23, 42, 0.035) 48px,
+        rgba(15, 23, 42, 0.035) 49px
+      );
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .status-draft {
+    @apply bg-amber-500 text-slate-950;
+  }
+
+  .status-review {
+    @apply bg-blue-600 text-white;
+  }
+
+  .status-approved {
+    @apply bg-green-600 text-white;
+  }
+
+  .status-changes {
+    @apply bg-red-600 text-white;
   }
 }

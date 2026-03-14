@@ -1,35 +1,46 @@
 import { loginAction } from './actions';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 
 interface LoginPageProps {
   searchParams?: Promise<{ error?: string }>;
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const resolvedSearchParams = await searchParams;
-  const hasError = resolvedSearchParams?.error === 'CredentialsSignin';
+  const params = await searchParams;
+  const hasError = params?.error === 'CredentialsSignin';
 
   return (
-    <main className="min-h-screen bg-app-bg p-4 text-slate-100">
-      <div className="mx-auto mt-20 max-w-md panel p-6">
-        <p className="text-[11px] uppercase tracking-[0.16em] text-amber-300">Field Access</p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight">Operational Memory Login</h1>
-        <p className="mt-2 text-base text-slate-300">Sign in to capture, review, and retrieve engineering knowledge.</p>
-
-        {hasError && <p className="mt-3 rounded bg-rose-900/30 p-2 text-sm text-rose-300">Invalid username or password.</p>}
-
-        <form action={loginAction} className="mt-5 space-y-4">
-          <label className="block text-sm">
-            <span className="mb-1 block text-slate-200">Username</span>
-            <input name="username" required className="w-full rounded border border-slate-600 bg-slate-950 p-3" />
-          </label>
-          <label className="block text-sm">
-            <span className="mb-1 block text-slate-200">Password</span>
-            <input name="password" type="password" required className="w-full rounded border border-slate-600 bg-slate-950 p-3" />
-          </label>
-          <button className="w-full rounded bg-amber-300 py-3 text-base font-bold text-slate-950 hover:bg-amber-200">Sign in</button>
-        </form>
-        <p className="mt-3 text-xs text-slate-500">Seed user example: supervisor / supervisor123</p>
-      </div>
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-black text-[#006B3F]">SKILLSPONGE</span>
+            <span className="text-2xl font-black text-[#E30613]">+</span>
+          </div>
+          <div>
+            <CardTitle className="text-2xl">Governed Knowledge Login</CardTitle>
+            <CardDescription>Sign in to capture, review, and transfer engineering know-how safely.</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {hasError && <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">Invalid username or password.</div>}
+          <form action={loginAction} className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" name="username" required />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" name="password" type="password" required />
+            </div>
+            <Button type="submit" className="w-full">Sign in</Button>
+          </form>
+          <p className="text-xs text-slate-500">Seed user: supervisor / supervisor123</p>
+        </CardContent>
+      </Card>
     </main>
   );
 }

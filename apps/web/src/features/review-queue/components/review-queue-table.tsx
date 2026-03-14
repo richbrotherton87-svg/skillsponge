@@ -3,11 +3,16 @@ import { addReviewCommentAction, updateKnowledgeStatusAction } from '@/app/(app)
 import { KnowledgeRecord, UserRole } from '@/lib/domain';
 import { getTypeLabel } from '@/lib/knowledge-service';
 import { getReviewQueueLabel, ReviewQueueContext } from '@/lib/review-queue-label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 
 export function ReviewQueueTable({
   records,
   actorRole,
-  reviewContextByRecordId
+  reviewContextByRecordId,
 }: {
   records: KnowledgeRecord[];
   actorRole: UserRole;
@@ -17,56 +22,50 @@ export function ReviewQueueTable({
   const isReviewerOrAdmin = actorRole === 'REVIEWER' || actorRole === 'ADMIN';
 
   return (
-    <section className="panel p-4">
-      <h3 className="text-lg font-semibold">Items awaiting review</h3>
-      <ul className="mt-3 space-y-2">
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle>Items awaiting review</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
         {records.map((record) => {
           const context = reviewContextByRecordId[record.id];
           return (
-            <li key={record.id} className="rounded bg-slate-900 p-3">
-              <p className="mb-2 text-xs uppercase tracking-wide text-slate-400">{getReviewQueueLabel(context)}</p>
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <Link href={`/knowledge-records/${record.id}`} className="font-medium hover:text-emerald-300">
+            <div key={record.id} className="rounded-md border p-4">
+              <Badge variant="outline" className="mb-2 text-[10px] uppercase">{getReviewQueueLabel(context)}</Badge>
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <Link href={`/knowledge-records/${record.id}`} className="font-medium hover:text-primary transition-colors">
                     {record.title}
                   </Link>
-                  <p className="text-sm text-slate-400">{getTypeLabel(record.type)} • {record.context.asset} • {record.author}</p>
-                  {context?.latestReviewerRationale && <p className="mt-1 text-xs text-amber-300">Latest requested changes: {context.latestReviewerRationale}</p>}
+                  <p className="text-sm text-muted-foreground">{getTypeLabel(record.type)} &middot; {record.context.asset} &middot; {record.author}</p>
+                  {context?.latestReviewerRationale && <p className="mt-1 text-xs text-yellow-500">Latest requested changes: {context.latestReviewerRationale}</p>}
                   {context?.openCommentCount ? (
-                    <p className="mt-1 text-xs text-slate-300">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       Open section comments: {context.openCommentCount}
                       {context.openCommentSections?.length ? ` (${context.openCommentSections.join(', ')})` : ''}
                     </p>
                   ) : null}
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 shrink-0">
                   {isSupervisor && record.approvalState === 'DRAFT' && (
                     <form action={updateKnowledgeStatusAction}>
                       <input type="hidden" name="id" value={record.id} />
                       <input type="hidden" name="status" value="UNDER_REVIEW" />
-                      <button className="rounded border border-slate-600 px-3 py-2 text-sm">Move to under review</button>
+                      <Button variant="outline" size="sm" type="submit">Move to review</Button>
                     </form>
                   )}
                   {isReviewerOrAdmin && record.approvalState === 'UNDER_REVIEW' && (
                     <div className="grid gap-2 md:grid-cols-2">
-                      <form action={updateKnowledgeStatusAction} className="space-y-2 rounded border border-slate-700 p-2">
+                      <form action={updateKnowledgeStatusAction} className="space-y-2 rounded-md border p-2">
                         <input type="hidden" name="id" value={record.id} />
                         <input type="hidden" name="decision" value="APPROVE" />
-                        <input
-                          name="reviewerRationale"
-                          className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs"
-                          placeholder="Optional approval rationale"
-                        />
-                        <button className="w-full rounded bg-emerald-500 px-3 py-2 text-sm font-semibold text-slate-950">Approve</button>
+                        <Input name="reviewerRationale" placeholder="Optional approval rationale" className="text-xs" />
+                        <Button type="submit" size="sm" className="w-full">Approve</Button>
                       </form>
-                      <form action={updateKnowledgeStatusAction} className="space-y-2 rounded border border-amber-700 p-2">
+                      <form action={updateKnowledgeStatusAction} className="space-y-2 rounded-md border border-yellow-500/30 p-2">
                         <input type="hidden" name="id" value={record.id} />
                         <input type="hidden" name="decision" value="REQUEST_CHANGES" />
-                        <select
-                          name="commentSection"
-                          className="w-full rounded border border-amber-700 bg-slate-950 px-2 py-1 text-xs"
-                          defaultValue="BODY"
-                        >
+                        <select name="commentSection" className="w-full rounded-md border bg-background px-2 py-1 text-xs" defaultValue="BODY">
                           <option value="BODY">Body</option>
                           <option value="TITLE">Title</option>
                           <option value="TAXONOMY">Taxonomy</option>
@@ -74,27 +73,16 @@ export function ReviewQueueTable({
                           <option value="CONFIDENCE">Confidence</option>
                           <option value="TYPE_PAYLOAD">Type-specific payload</option>
                         </select>
-                        <textarea
-                          name="commentText"
-                          rows={2}
-                          className="w-full rounded border border-amber-700 bg-slate-950 px-2 py-1 text-xs"
-                          placeholder="Optional section comment"
-                        />
-                        <textarea
-                          name="reviewerRationale"
-                          required
-                          rows={2}
-                          className="w-full rounded border border-amber-700 bg-slate-950 px-2 py-1 text-xs"
-                          placeholder="Required: what must be changed"
-                        />
-                        <button className="w-full rounded border border-amber-600 px-3 py-2 text-sm text-amber-300">Request changes</button>
+                        <Textarea name="commentText" rows={2} className="text-xs" placeholder="Optional section comment" />
+                        <Textarea name="reviewerRationale" required rows={2} className="text-xs" placeholder="Required: what must be changed" />
+                        <Button variant="outline" type="submit" size="sm" className="w-full text-yellow-500 border-yellow-500/30">Request changes</Button>
                       </form>
                     </div>
                   )}
                   {isReviewerOrAdmin && record.approvalState === 'UNDER_REVIEW' && (
-                    <form action={addReviewCommentAction} className="space-y-2 rounded border border-slate-700 p-2">
+                    <form action={addReviewCommentAction} className="space-y-2 rounded-md border p-2">
                       <input type="hidden" name="id" value={record.id} />
-                      <select name="commentSection" defaultValue="BODY" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs">
+                      <select name="commentSection" defaultValue="BODY" className="w-full rounded-md border bg-background px-2 py-1 text-xs">
                         <option value="BODY">Body</option>
                         <option value="TITLE">Title</option>
                         <option value="TAXONOMY">Taxonomy</option>
@@ -102,30 +90,24 @@ export function ReviewQueueTable({
                         <option value="CONFIDENCE">Confidence</option>
                         <option value="TYPE_PAYLOAD">Type-specific payload</option>
                       </select>
-                      <textarea
-                        name="commentText"
-                        required
-                        rows={2}
-                        className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs"
-                        placeholder="Add section comment without decision"
-                      />
-                      <button className="w-full rounded border border-slate-600 px-3 py-2 text-sm">Add comment</button>
+                      <Textarea name="commentText" required rows={2} className="text-xs" placeholder="Add section comment without decision" />
+                      <Button variant="outline" type="submit" size="sm" className="w-full">Add comment</Button>
                     </form>
                   )}
                   {isReviewerOrAdmin && (
                     <form action={updateKnowledgeStatusAction}>
                       <input type="hidden" name="id" value={record.id} />
                       <input type="hidden" name="status" value="ARCHIVED" />
-                      <button className="rounded border border-rose-700 px-3 py-2 text-sm text-rose-300">Archive</button>
+                      <Button variant="outline" size="sm" type="submit" className="text-red-400 border-red-500/30">Archive</Button>
                     </form>
                   )}
                 </div>
               </div>
-            </li>
+            </div>
           );
         })}
-        {!records.length && <li className="rounded bg-slate-900 p-3 text-sm text-slate-300">No draft or under-review records.</li>}
-      </ul>
-    </section>
+        {!records.length && <p className="text-sm text-muted-foreground">No draft or under-review records.</p>}
+      </CardContent>
+    </Card>
   );
 }
