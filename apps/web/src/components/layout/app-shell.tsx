@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { ReactNode } from 'react';
 import {
   AlertTriangle,
+  BookOpen,
+  ChevronRight,
   ClipboardList,
   Database,
   FlaskConical,
@@ -26,6 +28,7 @@ import { cn } from '@/lib/utils';
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   '/dashboard': Home,
   '/knowledge-records': Database,
+  '/procedures': BookOpen,
   '/experts': UsersRound,
   '/handover-packs': ClipboardList,
   '/continuity-risk': AlertTriangle,
@@ -57,7 +60,7 @@ export async function AppShell({ children, actor }: { children: ReactNode; actor
   const items = getNavForRole(actor.role);
   const queueCount = actor.role === 'REVIEWER' || actor.role === 'SUPERVISOR' || actor.role === 'ADMIN' ? (await listReviewQueue()).length : 0;
   const primaryItems = items.filter((item) =>
-    ['/dashboard', '/knowledge-records', '/experts', '/handover-packs', '/continuity-risk', '/audit-trail'].includes(item.href)
+    ['/dashboard', '/knowledge-records', '/procedures', '/handover-packs', '/continuity-risk', '/audit-trail'].includes(item.href)
   );
 
   return (
@@ -81,24 +84,36 @@ export async function AppShell({ children, actor }: { children: ReactNode; actor
             const Icon = iconMap[item.href] ?? Home;
             return (
               <div key={item.href} className="space-y-1">
-                <Link
-                  href={item.href}
-                  className={cn(
-                    'touch-target flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100',
-                    item.href === '/dashboard' && 'bg-[#006B3F]/10 text-[#006B3F]'
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
-                </Link>
-                {item.href === '/knowledge-records' && (
-                  <div className="space-y-1 pl-6">
-                    {recordSubFilters.map((filter) => (
-                      <Link key={filter.href} href={filter.href} className="touch-target flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700">
-                        {filter.label}
-                      </Link>
-                    ))}
-                  </div>
+                {item.href === '/knowledge-records' ? (
+                  <details className="group/kr">
+                    <summary
+                      className={cn(
+                        'touch-target flex cursor-pointer list-none items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100'
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                      <ChevronRight className="ml-auto h-3.5 w-3.5 text-slate-400 transition-transform group-open/kr:rotate-90" />
+                    </summary>
+                    <div className="space-y-1 pl-6">
+                      {recordSubFilters.map((filter) => (
+                        <Link key={filter.href} href={filter.href} className="touch-target flex items-center rounded-md px-2 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+                          {filter.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </details>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      'touch-target flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100',
+                      item.href === '/dashboard' && 'bg-[#006B3F]/10 text-[#006B3F]'
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
                 )}
               </div>
             );

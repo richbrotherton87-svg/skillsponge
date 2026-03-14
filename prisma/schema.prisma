@@ -37,6 +37,12 @@ enum AppRole {
   ADMIN
 }
 
+enum ProcedureScope {
+  GENERIC
+  MODEL_SPECIFIC
+  VARIANT_SPECIFIC
+}
+
 model AppUser {
   id           String   @id @default(cuid())
   username     String   @unique
@@ -124,6 +130,7 @@ model KnowledgeRecord {
   task            String
   symptom         String
   environment     String
+  scope           ProcedureScope?
   tags            String[]
   typePayload     Json?
   currentVersion  Int                 @default(1)
@@ -144,6 +151,7 @@ model KnowledgeRecord {
   @@index([system])
   @@index([task])
   @@index([symptom])
+  @@index([scope])
   @@index([createdAt])
   @@index([sourceExpertId])
   @@index([handoverPackId])

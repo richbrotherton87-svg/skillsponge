@@ -8,6 +8,7 @@ export type KnowledgeRecordType =
   | 'EXPERT_INTERVIEW'
   | 'SHADOWING_RECORD';
 
+export type ProcedureScope = 'GENERIC' | 'MODEL_SPECIFIC' | 'VARIANT_SPECIFIC';
 export type ApprovalState = 'DRAFT' | 'UNDER_REVIEW' | 'APPROVED' | 'ARCHIVED';
 export type ConfidenceLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 export type ReviewDecision = 'APPROVE' | 'REQUEST_CHANGES';
@@ -38,6 +39,7 @@ export interface BaseRecord {
   currentVersion: number;
   createdAt: string;
   lastValidatedAt?: string;
+  scope?: ProcedureScope;
   tags: string[];
   relatedRecordIds: string[];
   context: TaxonomyContext;
@@ -107,6 +109,7 @@ export interface KnowledgeRecordQuery {
   task?: string;
   symptom?: string;
   status?: ApprovalState | 'ALL';
+  scope?: ProcedureScope;
 }
 
 export interface DashboardMetrics {

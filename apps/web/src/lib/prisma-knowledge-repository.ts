@@ -246,6 +246,7 @@ function mapDbRecord(
     currentVersion: record.currentVersion,
     createdAt: formatDate(record.createdAt) ?? '',
     lastValidatedAt: formatDate(record.lastValidatedAt),
+    scope: (record.scope as KnowledgeRecord['scope']) ?? undefined,
     tags: record.tags,
     relatedRecordIds: record.relatedFrom.map((relation) => relation.toRecordId),
     context: {
@@ -340,6 +341,7 @@ function buildWhere(query?: KnowledgeRecordQuery): Prisma.KnowledgeRecordWhereIn
   if (query.system?.trim()) where.system = query.system.trim();
   if (query.task?.trim()) where.task = query.task.trim();
   if (query.symptom?.trim()) where.symptom = query.symptom.trim();
+  if (query.scope) where.scope = query.scope;
 
   return where;
 }
