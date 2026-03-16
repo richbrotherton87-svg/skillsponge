@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   BookOpen,
   ChevronRight,
+  ClipboardCheck,
   ClipboardList,
   Database,
   FlaskConical,
@@ -29,6 +30,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   '/dashboard': Home,
   '/knowledge-records': Database,
   '/procedures': BookOpen,
+  '/job-logs': ClipboardCheck,
   '/experts': UsersRound,
   '/handover-packs': ClipboardList,
   '/continuity-risk': AlertTriangle,
@@ -60,7 +62,7 @@ export async function AppShell({ children, actor }: { children: ReactNode; actor
   const items = getNavForRole(actor.role);
   const queueCount = actor.role === 'REVIEWER' || actor.role === 'SUPERVISOR' || actor.role === 'ADMIN' ? (await listReviewQueue()).length : 0;
   const primaryItems = items.filter((item) =>
-    ['/dashboard', '/knowledge-records', '/procedures', '/handover-packs', '/continuity-risk', '/audit-trail'].includes(item.href)
+    ['/dashboard', '/knowledge-records', '/procedures', '/job-logs', '/handover-packs', '/continuity-risk', '/audit-trail'].includes(item.href)
   );
 
   return (

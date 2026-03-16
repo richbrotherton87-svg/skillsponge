@@ -37,6 +37,22 @@ enum AppRole {
   ADMIN
 }
 
+enum JobLogStatus {
+  OPEN
+  IN_PROGRESS
+  SUBMITTED
+  REVIEWED
+  CLOSED
+}
+
+enum JobLogEntryType {
+  NOTE
+  VOICE_TRANSCRIPTION
+  OBSERVATION
+  ACTION_TAKEN
+  ISSUE_FOUND
+}
+
 enum ProcedureScope {
   GENERIC
   MODEL_SPECIFIC
@@ -204,5 +220,98 @@ model AuditEvent {
   actorUser         AppUser?        @relation("auditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
 
   @@index([knowledgeRecordId, createdAt])
+  @@index([eventType])
+}
+
+// ─── Job Log System ─────────────────────────────────────────
+
+model JobLog {
+  id               String        @id @default(cuid())
+  codeHash         String        @unique
+  jobReference     String        @unique
+  status           JobLogStatus  @default(OPEN)
+
+  customerName     String
+  siteName         String
+  siteAddress      String?
+  siteContactName  String
+  siteContactPhone String?
+  siteContactEmail String?
+
+  asset            String
+  assetSerial      String?
+  assetLocation    String?
+
+  technicianId     String
+  technicianName   String
+
+  startedAt        DateTime      @default(now())
+  completedAt      DateTime?
+  submittedAt      DateTime?
+  reviewedAt       DateTime?
+
+  reviewerName     String?
+  reviewNotes      String?
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  entries          JobLogEntry[]
+  photos           JobLogPhoto[]
+  auditEvents      JobLogAuditEvent[]
+
+  @@index([status])
+  @@index([technicianId])
+  @@index([asset])
+  @@index([customerName])
+  @@index([createdAt])
+}
+
+model JobLogEntry {
+  id           String          @id @default(cuid())
+  jobLogId     String
+  entryType    JobLogEntryType @default(NOTE)
+  content      String
+  isVoiceInput Boolean         @default(false)
+  authorName   String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  jobLog       JobLog          @relation(fields: [jobLogId], references: [id], onDelete: Cascade)
+
+  @@index([jobLogId, createdAt])
+}
+
+model JobLogPhoto {
+  id         String   @id @default(cuid())
+  jobLogId   String
+  storageKey String
+  fileName   String
+  mimeType   String   @default("image/jpeg")
+  sizeBytes  Int      @default(0)
+  caption    String?
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  jobLog     JobLog   @relation(fields: [jobLogId], references: [id], onDelete: Cascade)
+
+  @@index([jobLogId])
+}
+
+model JobLogAuditEvent {
+  id          String        @id @default(cuid())
+  jobLogId    String
+  actorUserId String?
+  actorName   String
+  actorRole   AppRole?
+  eventType   String
+  fromStatus  JobLogStatus?
+  toStatus    JobLogStatus?
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+
+  jobLog      JobLog        @relation(fields: [jobLogId], references: [id], onDelete: Cascade)
+
+  @@index([jobLogId, createdAt])
   @@index([eventType])
 }
